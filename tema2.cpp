@@ -140,7 +140,7 @@ void Display5() {
     
     double a = 0.2;
     
-    glColor3f(0.1,0.1,1.0); //rosu
+    glColor3f(0.1,0.1,1.0);
     glBegin(GL_LINE_STRIP);
     glVertex2f(-0.98, 0.96);
     for(double t = -pi/2; t <= pi/2; t += ratia){
@@ -156,19 +156,31 @@ void Display5() {
     glEnd();
     
     ratia = 0.02;
-    glColor3f(1.0,0.1,0.1); //rosu
+    double ratia_triunghi = 0.006;
+    glColor3f(1.0,0.1,0.1);
     for(double t = -pi/2; t <= pi/2; t += ratia){
-        glBegin(GL_LINE_STRIP);
+        //glBegin(GL_LINE_STRIP);
         glVertex2f(-0.98, 0.96);
         if(fabs(t) != pi/6) {
             double x = a/(4*cos(t)*cos(t) - 3);
             double y = a*tan(t)/(4*cos(t)*cos(t) - 3);
             if(x<0 && x>-1 && y > 0 && y< 1 ) {
+                double y_2 = a*tan(t+ratia_triunghi)/(4*cos(t+ratia_triunghi)*cos(t+ratia_triunghi) - 3);
+                double x_2 = a/(4*cos(t+ratia_triunghi)*cos(t+ratia_triunghi) - 3);
+                glBegin(GL_TRIANGLES);
+                
+                glVertex2f(-0.98, 0.96);
                 glVertex2f(x, y);
+                glVertex2f(x_2, y_2);
+                
+                
+                
+                
+                glEnd();
             }
         }
     }
-    glEnd();
+    //glEnd();
     
 //    for (int nr = 0; nr < 10; ++nr) {
 //        
