@@ -86,46 +86,61 @@ private:
 
 vector<pair<int, int>> AfisareSegmentDreapta3(int x0, int y0, int xn, int yn) {
     double m = float(yn - y0)/(xn-x0);
-    cout << m << endl;
     vector<pair<int,int>> M(100);
     
     if((x0 < xn) && (y0 <  yn)) {
         int dx = xn - x0;
         int dy = yn - y0;
-
-        int d = 2*dy - dx;
+        
+        
         int dE = 2*dy;
         int dNE = 2*(dy-dx);
-
+        
+        int dN = -2*dx;
+        
         int x = x0, y = y0;
-
-
+        
+        
         M.push_back(make_pair(x,y));
-        while(x < xn) {
-            if(d<0) {
-                d += dE;
-                x++;
-            }else {
-                d += dNE;
-                x++;
-                y++;
+        if( fabs(m) < 1) {
+            int d = 2*dy - dx;
+            while(x < xn) {
+                if(d<0) {
+                    d += dE;
+                    x++;
+                }else {
+                    d += dNE;
+                    x++;
+                    y++;
+                }
+                M.push_back(make_pair(x,y));
             }
-            //cout << x << " " << y << endl;
-            M.push_back(make_pair(x,y));
+        } else {
+            int d = 2*dx - dy;
+            while(y < yn) {
+                if(d<0) {
+                    d += dNE;
+                    y++;
+                    x++;
+                } else {
+                    d += dN;
+                    y++;
+                    
+                }
+                M.push_back(make_pair(x,y));
+            }
         }
     } else {
         //
     }
     return M;
-
+    
 }
 
+// abs(panta < 1) si x0 < xn si y0 < yn
 void Display1() {
     pair<int, int> x0 = make_pair(0,0);
     pair<int, int> y0 = make_pair(15,7);
-    
-//    pair<int, int> x0 = make_pair(0,15);
-//    pair<int, int> y0 = make_pair(15,10);
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
@@ -143,6 +158,31 @@ void Display1() {
     glPopMatrix();
 }
 
+// abs(panta > 1) si x0 < xn si y0 < yn
+void Display2() {
+    pair<int, int> x0 = make_pair(0,0);
+    pair<int, int> y0 = make_pair(7,15);
+    
+    GrilaCarteziana gc(15, 15);
+    glPushMatrix();
+    //glLoadIdentity();
+    gc.deseneaza();
+    gc.adauga_pixel(x0.first, x0.second);
+    
+    gc.adauga_pixel(0, 1);
+    gc.adauga_pixel(y0.first, y0.second);
+    
+    gc.deseneaza_dreapta(x0, y0);
+    
+    
+    vector<pair<int, int>> M = AfisareSegmentDreapta3(x0.first, x0.second, y0.first, y0.second);
+    for(vector<pair<int,int>>::iterator it = M.begin(); it != M.end(); ++it) {
+        gc.adauga_pixel(it->first, it->second);
+    }
+    glPopMatrix();
+}
+
+
 void Init(void) {
     
     glClearColor(1.0,1.0,1.0,1.0);
@@ -156,12 +196,15 @@ void Init(void) {
 
 void Display(void)
 {
-    
     switch(prevKey)
     {
         case '1':
             glClear(GL_COLOR_BUFFER_BIT);
             Display1();
+            break;
+        case '2':
+            glClear(GL_COLOR_BUFFER_BIT);
+            Display2();
             break;
         default:
             break;
