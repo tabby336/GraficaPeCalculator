@@ -30,6 +30,7 @@ public:
     }
     
     void deseneaza() {
+        glLineWidth(1);
         glColor3f(1.0, 0.1, 0.1);
         
         for(int i = 0; i <= linii; ++i) {
@@ -159,8 +160,6 @@ public:
                 }
             }
         } else { // y0 > yn
-            
-            
             int dy = y0 - yn;
             
             int dE = 2*dy;
@@ -183,10 +182,7 @@ public:
                     print_grosime_verticala(x,y, grosime);
                 }
             } else { //panta < 1
-                int dx = xn - x0;
-                int dy = y0 - yn;
                 int d = 2*dx - dy;
-                
                 print_grosime_orizontala(x,y,grosime);
                 while ( y > yn ) {
                     if(d < 0) {
@@ -245,14 +241,13 @@ void Display2() {
 
 void Display3() {
     pair<int, int> x0 = make_pair(0,15);
-    pair<int, int> y0 = make_pair(15,10);
+    pair<int, int> y0 = make_pair(14,8);
     int grosime = 3;
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
     glLoadIdentity();
     gc.deseneaza();
-//    gc.print_grosime(x0.first, x0.second,grosime);
     gc.AfisareSegmentDreapta3(x0.first, x0.second, y0.first, y0.second, grosime);
 
     gc.deseneaza_dreapta(x0, y0);
@@ -263,12 +258,13 @@ void Display3() {
 void Display4() {
     pair<int, int> x0 = make_pair(0,15);
     pair<int, int> y0 = make_pair(6,0);
+    int grosime = 2;
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
     glLoadIdentity();
     gc.deseneaza();
-    gc.AfisareSegmentDreapta3(x0.first, x0.second, y0.first, y0.second);
+    gc.AfisareSegmentDreapta3(x0.first, x0.second, y0.first, y0.second, grosime);
     
     gc.deseneaza_dreapta(x0, y0);
     glPopMatrix();
@@ -351,3 +347,6 @@ int main(int argc, char** argv)
     
     return 0;
 }
+
+
+
