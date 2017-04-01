@@ -129,7 +129,7 @@ public:
             int dNE = 2*(dy-dx);
             int dN = -2*dx;
             
-            if( fabs(m) < 1) { //panta < 1
+            if( fabs(m) <= 1) { //panta < 1
                 int d = 2*dy - dx;
                 print_grosime_verticala(x, y, grosime);
                 while(x < xn) {
@@ -167,7 +167,7 @@ public:
             int dS = 2*dx;
             int dSE = -dNE;
 
-            if( fabs(m) < 1) { //panta < 1
+            if( fabs(m) <= 1) { //panta < 1
                 int d = 2*dy - dx;
                 print_grosime_verticala(x,y, grosime);
                 while ( x < xn ) {
@@ -210,7 +210,7 @@ private:
 void Display1() {
     pair<int, int> x0 = make_pair(0,0);
     pair<int, int> y0 = make_pair(15,7);
-    int grosime = 4;
+    int grosime = 1;
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
@@ -257,8 +257,8 @@ void Display3() {
 
 void Display4() {
     pair<int, int> x0 = make_pair(0,15);
-    pair<int, int> y0 = make_pair(6,0);
-    int grosime = 2;
+    pair<int, int> y0 = make_pair(15,0);
+    int grosime = 1;
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
