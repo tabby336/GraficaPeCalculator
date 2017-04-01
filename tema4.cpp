@@ -71,6 +71,7 @@ public:
         glEnd();
     }
     
+    
     void print_grosime_verticala(int i,int j,int grosime) {
         int upper = j+grosime/2; ;
         if(!(grosime%2)) {
@@ -116,10 +117,20 @@ public:
             yn = aux;
         }
 
-        int x = x0, y = y0;
         
+        
+        double m;
         // panta
-        double m = float(yn - y0)/(xn-x0);
+        if(xn == x0) { //panta infinita
+            m = 2;
+            if (y0 < yn) {
+                int aux = y0; y0 = yn; yn = aux;
+            }
+        } else {
+            m = float(yn - y0)/(xn-x0);
+        }
+        //cout << m << endl;
+        int x = x0, y = y0;
         int dx = xn - x0;
         
         if(y0 <  yn) {
@@ -129,7 +140,7 @@ public:
             int dNE = 2*(dy-dx);
             int dN = -2*dx;
             
-            if( fabs(m) <= 1) { //panta < 1
+            if( fabs(m) <= 1) { //panta <= 1
                 int d = 2*dy - dx;
                 print_grosime_verticala(x, y, grosime);
                 while(x < xn) {
@@ -147,7 +158,7 @@ public:
                 int d = 2*dx - dy;
                 print_grosime_orizontala(x,y,grosime);
                 while(y < yn) {
-                    if(d<0) {
+                    if(d<=0) {
                         d += dNE;
                         y++;
                         x++;
@@ -210,7 +221,7 @@ private:
 void Display1() {
     pair<int, int> x0 = make_pair(0,0);
     pair<int, int> y0 = make_pair(15,7);
-    int grosime = 1;
+    int grosime = 3;
     
     GrilaCarteziana gc(15, 15);
     glPushMatrix();
@@ -270,6 +281,22 @@ void Display4() {
     glPopMatrix();
 }
 
+void Display5() {
+    pair<int, int> x0 = make_pair(3,7);
+    pair<int, int> y0 = make_pair(3,0);
+    int grosime = 1;
+    
+    GrilaCarteziana gc(15, 15);
+    glPushMatrix();
+    glLoadIdentity();
+    gc.deseneaza();
+    gc.AfisareSegmentDreapta3(x0.first, x0.second, y0.first, y0.second, grosime);
+    
+    gc.deseneaza_dreapta(x0, y0);
+    glPopMatrix();
+
+}
+
 void Init(void) {
     
     glClearColor(1.0,1.0,1.0,1.0);
@@ -297,6 +324,9 @@ void Display(void)
             break;
         case '4':
             Display4();
+            break;
+        case '5':
+            Display5();
             break;
         default:
             break;
