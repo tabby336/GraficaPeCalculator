@@ -144,7 +144,7 @@ public:
                 int d = 2*dy - dx;
                 print_grosime_verticala(x, y, grosime);
                 while(x < xn) {
-                    if(d<0) {
+                    if(d<=0) {
                         d += dE;
                         x++;
                     }else {
@@ -182,7 +182,7 @@ public:
                 int d = 2*dy - dx;
                 print_grosime_verticala(x,y, grosime);
                 while ( x < xn ) {
-                    if(d < 0) {
+                    if(d <= 0) {
                         d += dE;
                         x++;
                     } else {
@@ -196,7 +196,7 @@ public:
                 int d = 2*dx - dy;
                 print_grosime_orizontala(x,y,grosime);
                 while ( y > yn ) {
-                    if(d < 0) {
+                    if(d <= 0) {
                         d += dS;
                         y--;
                     } else {
