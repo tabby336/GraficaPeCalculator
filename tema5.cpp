@@ -85,7 +85,6 @@ public:
     
     void adauga_pixel(int i, int j) {
         if(!pixel_valid(i,j)) {
-            //cout << pixel_valid(i, j) << endl;
             return;
         }
         
@@ -204,7 +203,6 @@ public:
         glBegin(GL_POLYGON_MODE);
         poligon p = citire_poligon();
         for(int i = 0; i < p.len; ++i) {
-            //adauga_pixel(poligon[i].first, poligon[i].second);
             deseneaza_dreapta(p.muchii[i].vi, p.muchii[i].vf);
         }
         
@@ -227,16 +225,9 @@ public:
         
         for(int i = DOM_SCAN.first; i <= DOM_SCAN.second; ++i) {
             if(ssm.intersectii[i].len) {
-                cout << "Intersectii de: " << i << " cu len: " << ssm.intersectii[i].len << endl;
                 for (int j = 0; j < ssm.intersectii[i].len; ++j) {
-                    cout << ssm.intersectii[i].i[j].ratia << endl;
-                    cout << ssm.intersectii[i].i[j].xmin << endl;
-                    cout << ssm.intersectii[i].i[j].ymax << endl;
-                    //adauga_pixel(ceil(ssm.intersectii[i].i[j].xmin), ssm.intersectii[i].i[j].ymax);
                     adauga_pixel(ceil(ssm.intersectii[i].i[j].xmin), i);
-                    cout << endl;
                 }
-                cout << endl;
             }
         }
     
@@ -255,31 +246,23 @@ public:
             adauga_pixel(-x, -i);
         }
         while(a*a*(y-0.5) >= b*b*(x+1)) {
-//            cout << y << " " << y-0.5 << " " << a*a*(y-0.5) << endl;
-//            cout << x << " " << x+1 << " " << b*b*(x+1) << endl;
             deltaE = b*b*(2*x+1);
             deltaSE = b*b*(2*x+1) + a*a*(-2*y+1);
             if(fxpyp + deltaE <= 0.0) {
-                cout << "E: ";
                 // E este in interior
                 fxpyp += deltaE;
                 x++;
-                // ssm.setare
-                cout << x << " " << y << endl;
             }
             else if(fxpyp + deltaSE <= 0.0) {
                 // SE este in interior
-                cout << "SE: ";
                 fxpyp += deltaSE;
                 x++;
                 y--;
-                // ssm.adaugare
-                cout << x << " " << y << endl;
             }
+            
             for(int i = 0; i <= y; ++i) {
                 adauga_pixel(-x, -i);
             }
-            //adauga_pixel(-x, -y);
         }
         
         // regiunea 2
@@ -338,23 +321,16 @@ private:
         
         for (int i = 0; i < p.len; i++) {
             // pentru fiecare muchie din poligon
-//            cout << "Muchia: " << endl;
-//            cout << p.muchii[i].vi.first << " " << p.muchii[i].vi.second << endl;
-//            cout << p.muchii[i].vf.first << " " << p.muchii[i].vf.second << endl;
-            
-            
             if ( p.muchii[i].vi.second != p.muchii[i].vf.second) {
                 // ... care nu este orizontala
                 
                 // ymin si ymax
                 int ym = p.muchii[i].vi.second < p.muchii[i].vf.second ? p.muchii[i].vi.second : p.muchii[i].vf.second;
                 int yM = p.muchii[i].vi.second > p.muchii[i].vf.second ? p.muchii[i].vi.second : p.muchii[i].vf.second;
-                //cout << "ym si yM: " << ym << " " << yM << endl;
                 
                 // xmin si xmax
                 int xm = (ym == p.muchii[i].vi.second) ? p.muchii[i].vi.first : p.muchii[i].vf.first;
                 int xM = (yM == p.muchii[i].vi.second) ? p.muchii[i].vi.first : p.muchii[i].vf.first;
-                //cout << "xm si xM:" << xm << " " << xM << endl;
                 
                 // et ??
                 int len = et.intersectii[ym].len;
@@ -363,6 +339,7 @@ private:
                 et.intersectii[ym].i[len].ratia = (double)(xm - xM)/(ym - yM);
                 et.intersectii[ym].len += 1;
             }
+            
             
             /*
              sortarea in ordinea crescatoare conform cu 
@@ -438,9 +415,12 @@ private:
             return ;
         }
         
+        for(int i = DOM_SCAN.first; i <= DOM_SCAN.second; ++i) {
+            aet.len = 0;
+        }
+        
         do {
             for(int i = aet.len; i < aet.len + et.intersectii[y].len; i++) {
-                //cout << i << endl;
                 aet.i[i].ratia = et.intersectii[y].i[i - aet.len].ratia;
                 aet.i[i].xmin = et.intersectii[y].i[i - aet.len].xmin;
                 aet.i[i].ymax = et.intersectii[y].i[i - aet.len].ymax;
@@ -470,7 +450,7 @@ private:
                         // swap ratia
                         auxd = aet.i[i].ratia;
                         aet.i[i].ratia = aet.i[i+1].ratia;
-                        aet.i[i+1].ratia = auxi;
+                        aet.i[i+1].ratia = auxd;
                         
                         // swap xmin
                         auxd = aet.i[i].xmin;
@@ -502,7 +482,6 @@ private:
             for(int i = 0; i < aet.len; ++i) {
                 if(aet.i[i].ratia != 0) {
                     aet.i[i].xmin += aet.i[i].ratia;
-                    //adauga_pixel(aet.i[i].xmin, aet.i[i].ymax);
                 }
             }
             
@@ -541,7 +520,6 @@ void Display2() {
     gc.umpleteelipsa(14, 8);
     glPopMatrix();
 }
-
 
 void Display3() {
     GrilaCarteziana gc(15, 15, true);
