@@ -5,10 +5,12 @@
 #include <float.h>
 #include <iostream>
 #include <vector>
+#include <iostream>
+#define EPS 0.00000000001
 
 using namespace std;
 
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 
 // dimensiunea ferestrei in pixeli
 #define dim 600
@@ -43,7 +45,7 @@ struct intersectii {
 
 
 struct ET {
-    intersectii intersectii[100];
+    intersectii values[100];
 };
 
 class GrilaCarteziana {
@@ -224,64 +226,79 @@ public:
         ET ssm = calculssm(p, et,DOM_SCAN);
         
         for(int i = DOM_SCAN.first; i <= DOM_SCAN.second; ++i) {
-            if(ssm.intersectii[i].len) {
-                for (int j = 0; j < ssm.intersectii[i].len; ++j) {
-                    adauga_pixel(ceil(ssm.intersectii[i].i[j].xmin), i);
+            if(ssm.values[i].len) {
+                for (int j = 0; j < ssm.values[i].len; ++j) {
+                    adauga_pixel(ceil(ssm.values[i].i[j].xmin), i);
                 }
             }
         }
     
         glEnd();
     }
+
+    double F(double x, double y, int a, int b) {
+        return b*b*x*x+a*a*y*y-a*a*b*b;
+
+    }
     
     void umpleteelipsa(int a, int b) {
         int xi = 0;
-        int x = 0;
-        int y = b;
+        int x = -a;
+        int y = 0;
         double fxpyp = 0.0;
         double deltaE, deltaSE, deltaS;
         
         //regiunea 1
-        for(int i = 0; i <= y; ++i) {
-            adauga_pixel(-x, -i);
+        for(int i = x; i <= 0; ++i) {
+            adauga_pixel(i, 0);
         }
-        while(a*a*(y-0.5) >= b*b*(x+1)) {
-            deltaE = b*b*(2*x+1);
-            deltaSE = b*b*(2*x+1) + a*a*(-2*y+1);
-            if(fxpyp + deltaE <= 0.0) {
-                // E este in interior
-                fxpyp += deltaE;
-                x++;
-            }
-            else if(fxpyp + deltaSE <= 0.0) {
-                // SE este in interior
-                fxpyp += deltaSE;
-                x++;
-                y--;
-            }
-            
-            for(int i = 0; i <= y; ++i) {
-                adauga_pixel(-x, -i);
-            }
-        }
-        
-        // regiunea 2
-        while(y > 0) {
-            deltaSE = b*b*(2*x+1) + a*a*(-2*y+1);
-            deltaS = a*a*(-2*y+1);
-            if(fxpyp + deltaSE <= 0.0) {
-                // SE este in interior
-                fxpyp += deltaSE;
-                x++;
-                y--;
+        do{
+            int Fm = F(double(x)+0.5, double(y) - 1.0, a, b);
+            // cout << Fm <<"\n";
+            int lim = x;
+            if (Fm > EPS) {
+                ++x;
+                lim++;
+                --y;
             } else {
-                fxpyp += deltaS;
-                y--;
+                lim++;
+                --y;
             }
-            for(int i = 0; i <= y; ++i) {
-                adauga_pixel(-x, -i);
+            for(int i = lim; i <= 0; ++i) {
+                adauga_pixel(i, y);
+            } 
+        }while((1.0*b*b*x)/(1.0*a*a*y) - 1 > EPS );
+            
+        // regiunea 2
+        while(y >= -b && x <= 0) {
+            cout << "*************\n";
+            cout << x << " " << y << "\n";
+            int Fm = F(double(x)+1.0, double(y) - 0.5, a, b);
+            // cout << Fm <<"\n";
+            int lim = x;
+            int lin = y;
+            if (Fm > EPS) {
+                ++x;
+                // cout<<"caca";
+                lim += 1;
+            } else {
+                cout << "in interior: " << F(x+2.0, y-1.0, a, b)  <<"\n";
+                if (F(x+2.0, y-1.0, a, b) < EPS && x + 2 <= 0 && y - 1 > -a) {
+                    ++x;    
+                    --y;
+                } else {
+                    ++x;
+                }
+                lim++;
             }
+            cout << "LIM: " << lim << "\n";
+            cout << "y: " << y << "\n";
+            for(int i = lim; i <= 0; ++i) {
+                adauga_pixel(i, lin);
+            }         
         }
+        cout <<" TEST: " << F(-11.0, -5.0, a, b)<<"\n";
+
     }
     
 private:
@@ -315,7 +332,7 @@ private:
         
         ET et;
         for(int i = 0; i < 99; ++i) {
-            et.intersectii[i].len = 0;
+            et.values[i].len = 0;
         }
         bool change;
         
@@ -333,11 +350,11 @@ private:
                 int xM = (yM == p.muchii[i].vi.second) ? p.muchii[i].vi.first : p.muchii[i].vf.first;
                 
                 // et ??
-                int len = et.intersectii[ym].len;
-                et.intersectii[ym].i[len].ymax = yM;
-                et.intersectii[ym].i[len].xmin = xm;
-                et.intersectii[ym].i[len].ratia = (double)(xm - xM)/(ym - yM);
-                et.intersectii[ym].len += 1;
+                int len = et.values[ym].len;
+                et.values[ym].i[len].ymax = yM;
+                et.values[ym].i[len].xmin = xm;
+                et.values[ym].i[len].ratia = (double)(xm - xM)/(ym - yM);
+                et.values[ym].len += 1;
             }
             
             
@@ -349,29 +366,29 @@ private:
             for (int i = DOM_SCAN.first; i <= DOM_SCAN.second; ++i) {
                 do {
                     change = false;
-                    if(et.intersectii[i].len == 0) {
+                    if(et.values[i].len == 0) {
                         break;
                     }
-                    for(int j = 0; j+1 < et.intersectii[i].len; ++j) {
-                        if(et.intersectii[i].i[j].xmin > et.intersectii[i].i[j+1].xmin) {
+                    for(int j = 0; j+1 < et.values[i].len; ++j) {
+                        if(et.values[i].i[j].xmin > et.values[i].i[j+1].xmin) {
                             //swap
                             int auxi;
                             double auxd;
                             
                             // swap xmin
-                            auxd = et.intersectii[i].i[j].xmin;
-                            et.intersectii[i].i[j].xmin = et.intersectii[i].i[j+1].xmin;
-                            et.intersectii[i].i[j+1].xmin = auxd;
+                            auxd = et.values[i].i[j].xmin;
+                            et.values[i].i[j].xmin = et.values[i].i[j+1].xmin;
+                            et.values[i].i[j+1].xmin = auxd;
                             
                             // swap ratia
-                            auxd = et.intersectii[i].i[j].ratia;
-                            et.intersectii[i].i[j].ratia = et.intersectii[i].i[j+1].ratia;
-                            et.intersectii[i].i[j+1].ratia = auxd;
+                            auxd = et.values[i].i[j].ratia;
+                            et.values[i].i[j].ratia = et.values[i].i[j+1].ratia;
+                            et.values[i].i[j+1].ratia = auxd;
                             
                             // swap ymax
-                            auxi = et.intersectii[i].i[j].ymax;
-                            et.intersectii[i].i[j].ymax = et.intersectii[i].i[j+1].ymax;
-                            et.intersectii[i].i[j+1].ymax = auxi;
+                            auxi = et.values[i].i[j].ymax;
+                            et.values[i].i[j].ymax = et.values[i].i[j+1].ymax;
+                            et.values[i].i[j+1].ymax = auxi;
                             
                             change = true;
                         }
@@ -406,13 +423,13 @@ private:
         y = -1;
         // se determina y = min{ y' | et(y') != \emptyset}
         for(int i = DOM_SCAN.first; i <= DOM_SCAN.second; i++) {
-            if(et.intersectii[i].len != 0) {
+            if(et.values[i].len != 0) {
                 y = i;
                 break;
             }
         }
         if(y == -1) {
-            return ;
+            return ET();
         }
         
         for(int i = DOM_SCAN.first; i <= DOM_SCAN.second; ++i) {
@@ -420,12 +437,12 @@ private:
         }
         
         do {
-            for(int i = aet.len; i < aet.len + et.intersectii[y].len; i++) {
-                aet.i[i].ratia = et.intersectii[y].i[i - aet.len].ratia;
-                aet.i[i].xmin = et.intersectii[y].i[i - aet.len].xmin;
-                aet.i[i].ymax = et.intersectii[y].i[i - aet.len].ymax;
+            for(int i = aet.len; i < aet.len + et.values[y].len; i++) {
+                aet.i[i].ratia = et.values[y].i[i - aet.len].ratia;
+                aet.i[i].xmin = et.values[y].i[i - aet.len].xmin;
+                aet.i[i].ymax = et.values[y].i[i - aet.len].ymax;
             }
-            aet.len += et.intersectii[y].len;
+            aet.len += et.values[y].len;
             
             // eliminarea varfurilor cu ymax == y
             for(int i = 0; i < aet.len; ++i) {
@@ -469,11 +486,11 @@ private:
             }
             
             // copy aet in ssm
-            ssm.intersectii[y].len = aet.len;
+            ssm.values[y].len = aet.len;
             for(int i = 0; i < aet.len; ++i) {
-                ssm.intersectii[y].i[i].ratia = aet.i[i].ratia;
-                ssm.intersectii[y].i[i].xmin = aet.i[i].xmin;
-                ssm.intersectii[y].i[i].ymax = aet.i[i].ymax;
+                ssm.values[y].i[i].ratia = aet.i[i].ratia;
+                ssm.values[y].i[i].xmin = aet.i[i].xmin;
+                ssm.values[y].i[i].ymax = aet.i[i].ymax;
             }
             
             ++y;
@@ -486,7 +503,7 @@ private:
             }
             
             
-        }while((aet.len || et.intersectii[y].len) && y <= DOM_SCAN.second);
+        }while((aet.len || et.values[y].len) && y <= DOM_SCAN.second);
         
         return ssm;
     }
